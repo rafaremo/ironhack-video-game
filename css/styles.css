@@ -48,5 +48,10 @@ body {
 
 .player {
   padding: 15px;
-  font-size: 15pt;
+  font-size: 20pt;
+  font-family: 'VT323', monospace;
+  outline: none;
+  border: 2px solid blue;
+  border-radius: 5px;
+  text-align: center;
 }
