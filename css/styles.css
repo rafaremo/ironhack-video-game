@@ -7,7 +7,7 @@ html, body {
 }
 
 body {
-  background-color: deepskyblue;
+  background-color: darkslategrey;
 }
 
 .container {
@@ -34,7 +34,7 @@ body {
 .container button:hover {
   background-color: white;
   border: 2px solid white;
-  color: deepskyblue;
+  color: darkslategray;
 }
 
 .container .hide {
@@ -51,7 +51,7 @@ body {
   font-size: 20pt;
   font-family: 'VT323', monospace;
   outline: none;
-  border: 2px solid blue;
+  border: 2px solid black;
   border-radius: 5px;
   text-align: center;
 }

@@ -11,7 +11,10 @@ var instrucciones = new Image();
 instrucciones.src = './assets/instrucciones.png';
 var obstaculosP1 = [];
 var obstaculosP2 = [];
-var funcionesObstaculos = [generarBache];
+var funcionesObstaculos = [generarBache, generarArbol];
+var externalImages = {
+  ironhack: './assets/ironhack.png'
+}
 
 //class
 class Road{
@@ -101,6 +104,7 @@ class Bike{
     this.isJumping = false;
     this.jumpCounter = 0;
     this.counterCrash = 0;
+    this.choquesCount = 0;
   }
 
   jump(){
@@ -125,6 +129,8 @@ class Bike{
 
   drawCrash(){
     var posX = this.player===2 ? 528 : 16;
+    this.image.src = './assets/fallen-bike.png';
+    this.width = 64;
     ctx.beginPath();
     ctx.font = "40px monospace";
     ctx.fillStyle = 'white';
@@ -185,6 +191,7 @@ class Bache{
     
     if(this.checkIfCrash(this.jugador)){
       this.jugador.isFallen = true;
+      this.jugador.choquesCount++;
       this.x = -100;
     }
     if (this.jugador.isFallen) {
@@ -193,6 +200,43 @@ class Bache{
       if(this.jugador.counterCrash === 480*this.jugador.speed){
         this.jugador.counterCrash = 0;
         this.jugador.isFallen = false;
+        this.jugador.width=32;
+        this.jugador.image.src = './assets/bicicle.png';
+      }
+    } else {
+      this.y += 1*this.jugador.speed;
+    }
+    ctx.drawImage(this.image,this.x,this.y,this.width,this.height);
+  }
+}
+
+class Arbol extends Bache {
+  constructor(jugador) {
+    super(jugador);
+    this.jugador = jugador;
+    this.laneNum = Math.floor(Math.random() * 2);
+    this.width = 240;
+    this.height = 30;
+    this.xStart = jugador.player==1 ? 16 : 528;
+    this.x = this.laneNum === 0 ? this.xStart : this.xStart + 240;
+    this.image.src = this.laneNum === 0 ? './assets/arbol-left.png' : './assets/arbol.png';
+  }
+
+  draw(){
+    
+    if(this.checkIfCrash(this.jugador)){
+      this.jugador.isFallen = true;
+      this.jugador.choquesCount++;
+      this.x = -256;
+    }
+    if (this.jugador.isFallen) {
+      this.jugador.counterCrash++;
+      this.jugador.drawCrash();
+      if(this.jugador.counterCrash === 480*this.jugador.speed){
+        this.jugador.counterCrash = 0;
+        this.jugador.isFallen = false;
+        this.jugador.width=32;
+        this.jugador.image.src = './assets/bicicle.png';
       }
     } else {
       this.y += 1*this.jugador.speed;
@@ -273,28 +317,47 @@ function win(){
   if(bike1.km/1200 >= 20 || bike2.km/1200 >= 20){
     var ganador = '';
     var perdedor = '';
+    var ironImage = new Image();
+    ironImage.src = externalImages.ironhack;
+    var xIron = 0;
+    var xMessage = 0;
     if (bike1.km > bike2.km){
       ganador = roadPlayer1.playerName;
       perdedor = roadPlayer2.playerName;
+      xIron = 16;
+      xMessage = 528;
     } else {
       ganador = roadPlayer2.playerName;
       perdedor = roadPlayer1.playerName;
+      xIron = 528;
+      xMessage = 16;
     }
     clearInterval(interval);
     roadPlayer1.pause = true;
     roadPlayer2.pause = true;
     bike1.pause = true;
     bike2.pause = true;
-    ctx.beginPath();
-    ctx.font = "40px monospace";
-    ctx.fillStyle = 'white';
-    ctx.fillText(ganador + ' ha llegado a Ironhack', 200,200);
-    ctx.font = "20px monospace";
-    ctx.fillStyle = 'white';
-    ctx.fillText('buen intento ' + perdedor, 200,250);
-    ctx.closePath();
-    document.getElementById('restart').removeAttribute('class');
-    document.getElementById('pausa').classList.add("hide");
+    ironImage.onload = function (){
+      ctx.beginPath();
+      ctx.drawImage(ironImage,xIron+90,90,300,300);
+      ctx.fillStyle = 'peru';
+      ctx.fillRect(xMessage,0,480,512);
+      ctx.font = "40px monospace";
+      ctx.fillStyle = 'white';
+      ctx.fillText(ganador + ' ha llegado', xMessage + 5, 40);
+      ctx.fillText('a Ironhack', xMessage + 5, 90);
+      ctx.font = "20px monospace";
+      ctx.fillStyle = 'white';
+      ctx.fillText('¡Buen intento ' + perdedor + '!', xMessage+5,140);
+      ctx.fillText(roadPlayer1.playerName + ':', xMessage+5, 190);
+      ctx.fillText(roadPlayer2.playerName + ':', xMessage+240+5, 190);
+      ctx.fillText('Choques: ' + bike1.choquesCount, xMessage+5, 220);
+      ctx.fillText('Choques: ' + bike2.choquesCount, xMessage+240+5, 220);
+      ctx.fillText('km recorridos: ' + (bike1.km/1200).toFixed(2), xMessage+5, 250);
+      ctx.fillText('km recorridos: ' + (bike2.km/1200).toFixed(2), xMessage+240+5, 250);
+      document.getElementById('restart').removeAttribute('class');
+      document.getElementById('pausa').classList.add("hide"); 
+    }
   }
 }
 
@@ -362,7 +425,12 @@ function generarBache(jugador){
 }
 
 function generarArbol(jugador){
-
+  var arbol = new Arbol(jugador);
+  if(jugador.player === 1){
+    obstaculosP1.push(arbol);
+  } else {
+    obstaculosP2.push(arbol);
+  }
 }
 
 function generarCharco(jugador){
@@ -388,14 +456,14 @@ document.getElementById('startGame').addEventListener('click', function(){
 });
 
 document.getElementById('pausa').addEventListener('click', function(){
-  if(!roadPlayer1.pause){
+  if(!bike1.pause && !bike2.pause){
     pausa();
     document.getElementById('restart').removeAttribute('class');
-    document.getElementById('pausa').innerHTML = "Continuar";
+    document.getElementById('pausa').innerHTML = "Continuar (P)";
   } else {
     unpause();
     document.getElementById('restart').classList.add("hide");
-    document.getElementById('pausa').innerHTML = "Pausa";
+    document.getElementById('pausa').innerHTML = "Pausa (P)";
   }
 });
 
@@ -404,28 +472,44 @@ document.getElementById('restart').addEventListener('click', function(){
   unpause();
   document.getElementById('restart').classList.add("hide");
   document.getElementById('pausa').removeAttribute('class');
-  document.getElementById('pausa').innerHTML = "Pausa";
+  document.getElementById('pausa').innerHTML = "Pausa (P)";
 });
 
 addEventListener('keydown', function(e){
   switch(e.which){
     case 39:
+      if(bike2.isJumping) break;
       bike2.moveBike('right');
       break;
     case 37:
+      if(bike2.isJumping) break;
       bike2.moveBike('left');
       break;
     case 38:
+      if(bike2.isJumping) break;
       bike2.jump();
       break;
     case 90:
+      if(bike1.isJumping) break;
       bike1.moveBike('left');
       break;
     case 67:
+      if(bike1.isJumping) break;
       bike1.moveBike('right');
       break;
     case 68:
+      if(bike1.isJumping) break;
       bike1.jump();
       break;
+    case 80:
+      if(!bike1.pause && !bike2.pause){
+        pausa();
+        document.getElementById('restart').removeAttribute('class');
+        document.getElementById('pausa').innerHTML = "Continuar (P)";
+      } else {
+        unpause();
+        document.getElementById('restart').classList.add("hide");
+        document.getElementById('pausa').innerHTML = "Pausa (P)";
+      }
   } 
 });
