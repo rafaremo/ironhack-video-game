@@ -160,7 +160,7 @@ class Bike{
     if(this.isJumping){
       this.jumpCounter++;
       ctx.drawImage(this.image, this.x, this.y, this.width*1.5, this.height*1.5);
-      var jumpC = 180 / this.speed;
+      var jumpC = 120 / this.speed;
       if(this.jumpCounter === jumpC){
         this.isJumping = false;
         this.jumpCounter = 0;
@@ -524,5 +524,6 @@ addEventListener('keydown', function(e){
         document.getElementById('restart').classList.add("hide");
         document.getElementById('pausa').innerHTML = "Pausa (P)";
       }
+    break;
   } 
 });
