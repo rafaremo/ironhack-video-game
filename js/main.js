@@ -16,6 +16,14 @@ var externalImages = {
   ironhack: './assets/ironhack.png'
 }
 
+var externalAudio = {
+  song1: 'http://66.90.93.122/ost/p.o.w.-prisoner-of-war-nintendo-8-bit-gamerip-soundtrack/ufjzgdfm/Tarkun%20Kidon%20-%20Level%204%20%28Enemy%20Base%29.mp3'
+}
+
+var sound = new Audio();
+sound.src = externalAudio.song1;
+sound.loop = true;
+
 //class
 class Road{
   constructor(x=0, playerName='incognito'){
@@ -269,6 +277,7 @@ function start(){
   roadPlayer1 = new Road(0, p1);
   roadPlayer2 = new Road(512, p2);
   interval = setInterval(update, 1000/60);
+  sound.play();
 }
 
 function restart(){
@@ -284,6 +293,8 @@ function restart(){
   obstaculosP1 = [];
   obstaculosP2 = [];
   getNames();
+  sound.pause();
+  sound.currentTime = 0;
 }
 
 function pausa(){
@@ -303,6 +314,7 @@ function pausa(){
   ctx.fillText('¡Preciona Continuar para llegar a tiempo!', 200,250);
   ctx.drawImage(instrucciones, 200, 280);
   ctx.closePath();
+  sound.pause();
 }
 
 function unpause(){
@@ -311,6 +323,7 @@ function unpause(){
   bike1.pause = false;
   bike2.pause = false;
   interval = setInterval(update, 1000/60);
+  sound.play();
 }
 
 function win(){
