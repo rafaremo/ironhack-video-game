@@ -160,8 +160,8 @@ class Bike{
     if(this.isJumping){
       this.jumpCounter++;
       ctx.drawImage(this.image, this.x, this.y, this.width*1.5, this.height*1.5);
-      var jumpC = 120 / this.speed;
-      if(this.jumpCounter === jumpC){
+      var jumpC = 180 / this.speed;
+      if(this.jumpCounter >= jumpC){
         this.isJumping = false;
         this.jumpCounter = 0;
       }
@@ -366,8 +366,8 @@ function win(){
       ctx.fillText(roadPlayer2.playerName + ':', xMessage+240+5, 190);
       ctx.fillText('Choques: ' + bike1.choquesCount, xMessage+5, 220);
       ctx.fillText('Choques: ' + bike2.choquesCount, xMessage+240+5, 220);
-      ctx.fillText('km recorridos: ' + (bike1.km/1200).toFixed(2), xMessage+5, 250);
-      ctx.fillText('km recorridos: ' + (bike2.km/1200).toFixed(2), xMessage+240+5, 250);
+      ctx.fillText('km: ' + (bike1.km/1200).toFixed(2), xMessage+5, 250);
+      ctx.fillText('km: ' + (bike2.km/1200).toFixed(2), xMessage+240+5, 250);
       document.getElementById('restart').removeAttribute('class');
       document.getElementById('pausa').classList.add("hide"); 
     }
